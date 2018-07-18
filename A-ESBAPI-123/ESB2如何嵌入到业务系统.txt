@@ -1,0 +1,27 @@
+ ESB2作为服务方，监听MQ队列消息处理时，嵌入到业务系统有两种方式。
+ 1. 业务系统是Web应用，通过servelet嵌入。
+ 		第一步:  在classpath (WEB-INF/classes) 下增加 esb.properties 配置文件，内容参考 esb_server.properties 信息
+ 		第二步：此时需要在业务系统的web.xml增加如下配置
+			 		<listener><listener-class>spc.webos.web.listener.ESB2ServletCxtListener</listener-class></listener>
+					<context-param> <!-- 如果需要监听异步应答消息处理则配置异步处理类，否则无需配置 -->
+							<param-name>ESB_AsynResponseClass</param-name>
+							<param-value>com.bjrcb.xxxx</param-value>
+					</context-param>
+					<context-param> <!-- 配置处理请求的处理类 -->
+							<param-name>ESB_RequestClass</param-name>
+							<param-value>com.bjrcb.xxxx</param-value>
+					</context-param>
+		
+		
+2. 业务系统使用spring配置模式。
+	第一步:  在classpath (WEB-INF/classes) 下增加 esb.properties 配置文件，内容参考 esb_server.properties 信息
+	第二步:  在业务系统spring环境增加一个独立的esb.xml配置文件。
+				<bean class="spc.webos.endpoint.ESB2" factory-method="getInstance"
+						init-method="initESB" destroy-method="destroy">
+						<property name="requestOnMessage">
+							<bean class="xxx.xx.xx" init-method="init" />
+						</property>
+				</bean>
+				
+3. 如果业务系统只是请求方使用tcp协议，则不需要MQ相关jar支持。MQ相关jar为： com.ibm.*.jar, connector.jar
+				

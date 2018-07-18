@@ -1,0 +1,13 @@
+<transaction>
+	<header>
+		<msg>
+			<sndAppCd>ESB</sndAppCd>
+			<msgCd>ESB.00000010.01</msgCd>
+		</msg>
+	</header>
+	<body>
+		<request>
+			<h>ww</h>
+		</request>
+	</body>
+</transaction>

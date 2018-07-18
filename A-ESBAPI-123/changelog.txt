@@ -1,0 +1,92 @@
+----------- 712 -----------
+1. 修改AccessTPool的keepQueue属性为false, 达到最好的负载均衡
+
+---------720------------
+2014-08-01
+1. 增加了前端渠道对TCP，HTTP协议的支持
+
+----------721----------
+2014-09-21
+1. 修改MQManager类，在集群发送时，如果其中一个通道连接失败，则接下来的交易在一定时间内不会尝试重连这个通道, 提高系统性能和响应速度
+
+-----------------722----------
+2014-09-22
+1. 修改MQManager类，确保在MQ连接失败时，防止大量错误日志打印到日志文件，防止队列管理器重启后自动重连
+
+
+-------------724-----------
+2014-10-03
+1. 修改MQMultiChannel.algorithm=2, 使用轮询算法，通过集群多通道进行发送消息
+
+
+-----------750--------------
+2014-10-16
+1. 增加了spc.webos.data包， 用于解析xml报文到Message对象
+2. 增加大量和MQ连接相关日志，用于追踪MQ重连
+3. 修改MQManager类，将MQ底层tcp超时时间由默认不超时变为2秒超时
+
+-----------------751--------------
+2014-11-02
+1. 修改MQManager类，
+	a. 将底层MQ连接超时变为5秒
+	b. 只要重连就先断开连接
+	c. 一个连接错误则60秒后重新尝试此连接
+2. 修改MQCnnPool类，防止队列管理器不存在导致启动发生异常
+3. 修改Accessor.receive方法。当读取错误时不再发起一次重连读取
+4. 修改ReceiverThread, 遇到任何异常除了2033，都重新连接队列管理器
+5. 修改Accessor.handleMQException, 只有2033没有消息异常才不引发队列管理器重连
+
+
+---------------752------------------
+2014-11-12
+1. 修改MQManager， 容许应用程序指定一个物理tcp连接是否可以共享给多个连接，以及共享比例
+2. MQ底层超时从5秒修改为2秒
+3. 调整了一些日志，减少日志输出，增加一些业务执行的关键日志输出
+
+2014-11-13
+1. 修改ClusterEndpoint, EndpointFactory, 支持配置集群endpoint时指定更多参数，比如集群算法是随机，轮训，还是主备
+    "cluster:{alg:0,cursor:2,endpoints:['tcp://192.168.7.59:30002','tcp://192.168.7.59:30002']}"
+    "tcp://192.168.7.59:30002,tcp://192.168.7.59:30002"
+
+-------------------753------------
+2014-12-15
+1. 修改BizPoolOnMessage, AccessTPool, 增加maxBlockSize属性，容许业务处理线程处理不过来，消息阻塞到MQ队列，默认为-1不阻塞
+
+-------------------800----------------
+2015-01-01
+1. 修改了ESB2， 增加了AbstractBizOnMessage类：修改主要目的是让ESB2解除必须单例使用的限制，
+   容许服务系统可以连接多套ESB环境二不受影响。 客户业务处理类server.BizOnMessage必须继承AbstractBizOnMessage类。
+   容许不同ESB环境来的请求报文，最后发送回不同的ESB环境。
+   esb2.sendResponse(response); 而非 ESB2.getInstance().sendResponse(response); 
+2. 修改AccessTPool， 让默认maxBlockSize=0
+   
+--------------801------------
+2015-01-25
+1. 修改了Accessor.receive(MQManager mqm, String qname, MQGetMessageOptions gmo, MQMessage qmsg)
+    回退到以前版本，当读取消息MQ连接失败时，重新创建连接后再读取一次。
+    
+    
+-------------802---------------
+2015-05-20
+1. 修改ESB2类，增加了req2rep方法，将请求报文头变成应答报文头
+2. 修改了MQManager增加了 str2map方法，解析字符串配置为Map格式"219.143.38.252:33399/SVRCONN_GW"
+    修改了MQCnnPool, AccessTPool 容许配置MQ channel时使用字符串作为参数: "219.143.38.252:33399/SVRCONN_GW"
+3. 修改AccessTPool容许配置MQ属性时使用props， 也可以使用channel。 和Access保持一致。
+
+
+----------805---------
+2015-05-25 hell
+1. 修改MQManager，减少打印日志，容许不提供MQ通道
+
+---------806------------
+2015-07-01 chenjs
+1. 修改ClusterEndpoint.algorithm=2, 客户端随机选择一个endpoint作为开始
+
+--------808-------------
+2016-01-15 chenjs
+1. 修改MQManager的reconnect方法，修复后台MQ读取线程不能自动重连队列管理器问题
+
+
+
+
+
